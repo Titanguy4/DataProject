@@ -19,7 +19,7 @@ num_experiments = 1
 parameter = "h_evol" # h_evol ou q_norm_evol
 resolution = "LR" # HR ou LR
 
-folder_path = f"../experiences/{num_experiments}/{parameter+'_'+resolution}" # Dossier contenant les fichiers
+folder_path = f"../donnees/experiences/{num_experiments}/{parameter+'_'+resolution}" # Dossier contenant les fichiers
 
 """
 Function to search the maximum value in the data (all files)
