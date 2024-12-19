@@ -5,6 +5,7 @@ et la résolution (HR ou LR).
 """
 
 import os
+import argparse
 import numpy as np
 import matplotlib
 from numpy import ndarray
@@ -15,11 +16,6 @@ from matplotlib.animation import FuncAnimation
 
 # Paramètres de l'animation
 num_seconds = 600
-num_experiments = 1
-parameter = "h_evol" # h_evol ou q_norm_evol
-resolution = "HR" # HR ou LR
-
-folder_path = f"../donnees/experiences/{num_experiments}/{parameter+'_'+resolution}" # Dossier contenant les fichiers
 
 """
 Function to search the maximum value in the data (all files)
@@ -66,7 +62,7 @@ Parameters: frame - the time to load the data for
 Return the data as a 2D numpy array
 """
 def load_data_for_time(frame) -> ndarray|None:
-    file_name = f"{parameter}_{frame + (((num_experiments-1) * 600) + (num_experiments-1))}.txt"
+    file_name = f"{parameter}_{frame + (((experiment-1) * 600) + (experiment-1))}.txt"
     file_path = os.path.join(folder_path, file_name)
 
     if os.path.exists(file_path):
@@ -94,15 +90,28 @@ def update(frame, image, axes) -> list:
     if data_2d is not None:
         image.set_data(data_2d)
 
-    axes.set_title(f"Evolution de {parameter} - Expérience {num_experiments} - Seconde {frame} - {resolution}")
+    axes.set_title(f"Evolution de {parameter} - Expérience {experiment} - Seconde {frame} - {resolution}")
     return image
 
 
-def __main__() -> None:
+def main() -> None:
     figure, axes, image = init()
     # Create a variable to not delete the animation before the end
-    animation = FuncAnimation(figure, update, fargs=(image, axes), frames=range(100, num_seconds))
+    animation = FuncAnimation(figure, update, fargs=(image, axes), frames=range(0, num_seconds))
     plt.tight_layout() # To space the plot correctly
     plt.show()
 
-__main__()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Dataplot for LR/HR waterflow.")
+    parser.add_argument("--experiment", type=int, help="Experiment number (1-14).")
+    parser.add_argument("--parameter", type=str, help="Parameter plotted (q_norm_evol/h_evol).")
+    parser.add_argument("--resolution", help="Experiment resolution (LR/HR).")
+
+    args = parser.parse_args()
+
+    experiment = args.experiment if args.experiment else 1
+    parameter = args.parameter if args.parameter else "h_evol"
+    resolution = args.resolution if args.resolution else "LR"
+    folder_path = f"../donnees/experiences/{experiment}/{parameter+'_'+resolution}" # Dossier contenant les fichiers
+    
+    main()
