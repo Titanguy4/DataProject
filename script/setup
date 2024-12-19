@@ -1,0 +1,22 @@
+#!/bin/bash
+
+read -p "Tkinter installed? [Y/n] " confirm && ([[ -z "$confirm" || "$confirm" =~ ^[yY]([eE][sS])?$ ]] || { echo -e "Run:\nsudo apt-get install python3-tk\nto install tkinter"; exit 1; })
+
+echo "Checking required command..."
+
+if ! command -v python3 2>&1 >/dev/null
+then
+    echo "python3 could not be found"
+    exit 1
+fi
+
+echo "Creating venv..."
+python3 -m venv venv
+
+echo "Activating venv..."
+source venv/bin/activate
+
+echo "Installing requirements..."
+pip install -r requirements.txt
+
+echo "Setup done!"
