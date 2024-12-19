@@ -17,7 +17,7 @@ from matplotlib.animation import FuncAnimation
 num_seconds = 600
 num_experiments = 1
 parameter = "h_evol" # h_evol ou q_norm_evol
-resolution = "LR" # HR ou LR
+resolution = "HR" # HR ou LR
 
 folder_path = f"../donnees/experiences/{num_experiments}/{parameter+'_'+resolution}" # Dossier contenant les fichiers
 
@@ -101,7 +101,7 @@ def update(frame, image, axes) -> list:
 def __main__() -> None:
     figure, axes, image = init()
     # Create a variable to not delete the animation before the end
-    animation = FuncAnimation(figure, update, fargs=(image, axes), frames=range(0, num_seconds))
+    animation = FuncAnimation(figure, update, fargs=(image, axes), frames=range(100, num_seconds))
     plt.tight_layout() # To space the plot correctly
     plt.show()
 
