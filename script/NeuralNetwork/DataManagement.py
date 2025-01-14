@@ -1,6 +1,8 @@
 import json
 import os
 import numpy as np
+import torch
+from torch.utils.data import DataLoader, TensorDataset
 
 
 def normalize_tensor_global(tensor, global_min, global_max):
@@ -38,7 +40,7 @@ def extract_experiment_data(experiment_number, parameter):
         targets.append(data2)
     return np.array(inputs), np.array(targets)
 
-def load_data(parameter):
+def load_data(parameter, device):
     # Charger les données d'entraînement (expériences 1 à 9)
     train_inputs, train_targets = [], []
     for exp_num in range(1, 10):
