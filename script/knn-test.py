@@ -82,12 +82,31 @@ scaler_Y = StandardScaler()
 X_scaled = scaler_X.fit_transform(X_all)
 Y_scaled = scaler_Y.fit_transform(Y_all)
 
-# Split data into training and testing sets
+# Split data into training and testing with 80% training and 20% testing
 X_train, X_test, Y_train, Y_test = train_test_split(X_scaled, Y_scaled, test_size=0.2, random_state=42)
 
+
+### edTest(test_nums) ###
+# Choosing k range from 1 to 70
+k_value_min = 1
+k_value_max = 70
+
+# Create a list of integer k values between k_value_min and 
+# k_value_max using linspace
+k_list = np.linspace(k_value_min,k_value_max,num=70,dtype=int)
+
+# Setup a grid for plotting the data and predictions
+fig, ax = plt.subplots(figsize=(10,6))
+
+# Create a dictionary to store the k value against MSE fit {k: MSE@k} 
+knn_dict = {}
+
+# Variable used for altering the linewidth of values kNN models
+j=0
+
 # Function to create and train the k-NN regressor
-def train_knn(X_train, Y_train):
-    knn = KNeighborsRegressor(n_neighbors=2)
+def train_knn(X_train, Y_train, k):
+    knn = KNeighborsRegressor(n_neighbors=k)
     knn.fit(X_train, Y_train)
     return knn
 
@@ -96,23 +115,56 @@ def save_model(model, filename):
     joblib.dump(model, filename)
     print(f"Model saved to {filename}")
 
-# Train the k-NN model
-knn_regressor = train_knn(X_train, Y_train)
+# Train the k-NN model for each k value
+for k in k_list:
+    knn_regressor = train_knn(X_train, Y_train, k)
+    Y_pred = knn_regressor.predict(X_test)
+    mse = mean_squared_error(Y_test, Y_pred)
+    knn_dict[k] = mse
+
+    # Helper code to plot the data and various kNN model predictions
+    colors = ['grey','r','b']
+    if k in [1,10,70]:
+        xvals = X_test  # Use the existing test data, which has the correct shape
+        ypreds = knn_regressor.predict(xvals)
+
+        # Plot the predictions using the correct x and y values
+        ax.plot(range(len(ypreds)), ypreds, '-', label=f'k = {int(k)}', linewidth=j+2, color=colors[j])
+        j+=1
+
+# Plot a graph which depicts the relation between the k values and MSE
+fig, ax = plt.subplots(figsize=(10,6))
+ax.plot(knn_dict.keys(), knn_dict.values(), 'o-')
+ax.set_title('k-NN Regression')
+ax.set_xlabel('k')
+ax.set_ylabel('MSE')
+plt.show()
+
+# Find the k value with the minimum MSE
+min_mse = min(knn_dict.values())
+best_k = [k for k, mse in knn_dict.items() if mse == min_mse][0]
+print(f"Best k value: {best_k} with MSE: {min_mse}")
+
+# Helper code to compute the R-squared value of the best model
+model = train_knn(X_train, Y_train, best_k)
+Y_pred = model.predict(X_test)
+r2 = r2_score(Y_test, Y_pred)
+print(f"R-squared: {r2}")
 
 # Save the trained model
-save_model(knn_regressor, "knn_regressor_model.joblib")
+# save_model(knn_regressor, "knn_regressor_model.joblib")
 
 #CNN pour extraire des infos plus Pixel Shuffle pour augmenter la résolution 
 
 # Make predictions on the test data
-Y_pred = knn_regressor.predict(X_test)
+# Y_pred = knn_regressor.predict(X_test)
 
-# Evaluate the model
-mse = mean_squared_error(Y_test, Y_pred)
-r2 = r2_score(Y_test, Y_pred)
+# # Evaluate the model
+# mse = mean_squared_error(Y_test, Y_pred)
+# r2 = r2_score(Y_test, Y_pred)
 
-print(f"Mean Squared Error: {mse}")
-print(f"R-squared: {r2}")
+# print(f"Mean Squared Error: {mse}")
+# print(f"R-squared: {r2}")
 
 # Function to initialize the plot for animation
 def init():
@@ -164,12 +216,12 @@ def update(frame, knn, scaler_X, scaler_Y, im1, im2, ax1, ax2):
 fig, ax1, ax2, im1, im2 = init()
 
 #Create the animation
-animation = FuncAnimation(fig, update, frames=range(num_seconds * num_experiments),
-                          fargs=(knn_regressor, scaler_X, scaler_Y, im1, im2, ax1, ax2),
-                          interval=100, blit=False)
+# animation = FuncAnimation(fig, update, frames=range(num_seconds * num_experiments),
+#                           fargs=(knn_regressor, scaler_X, scaler_Y, im1, im2, ax1, ax2),
+#                           interval=100, blit=False)
 
-plt.tight_layout()  # To space the plot correctly
-plt.show()
+# plt.tight_layout()  # To space the plot correctly
+# plt.show()
 
 # Save animations for each experiment
 # for experiment_idx in range(num_experiments):
