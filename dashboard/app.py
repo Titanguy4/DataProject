@@ -1,24 +1,17 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
+import knn
+import neural_network
 
-# Title and description
-st.title("Simple Streamlit App")
-st.write("This is a basic example of a Streamlit app. You can input text, select a number, and view a chart.")
+# Set the title for the dashboard
+st.set_page_config(page_title="Shallow Waters", layout="wide")
+st.title("Shallow Waters")
 
-# Text input
-user_input = st.text_input("Enter some text:", placeholder="Type something here...")
-if user_input:
-    st.write(f"You entered: {user_input}")
+# Sidebar for navigation
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Select a section", ("KNN", "Neural Network"))
 
-# Number slider
-number = st.slider("Pick a number:", min_value=1, max_value=100, value=50)
-st.write(f"Selected number: {number}")
-
-# Generate and display a random chart
-st.write("Here's a random chart based on your selected number:")
-data = pd.DataFrame(
-    np.random.randn(number, 3),
-    columns=["A", "B", "C"]
-)
-st.line_chart(data)
+# Load the selected page
+if page == "KNN":
+    knn.show_knn()
+elif page == "Neural Network":
+    neural_network.show_nn()
