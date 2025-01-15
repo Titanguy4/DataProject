@@ -16,9 +16,6 @@ def show_nn():
     st.header("Réseau de neurones")
     st.write("Bienvenue dans la section du réseau de neurones.")
 
-    st.write("## Visualisation des résultats de l'entrainement") 
-    st.image(load_image("../script/loss_plot.png"), caption="Graphique sauvegardé", use_container_width=True)
-
     st.title("Présentation du graphique de perte par rapport au nombre d'itérations sur les données d'entraînement et de validation")
 
     # Radio buttons to choose between trained or test experiences
@@ -33,29 +30,22 @@ def show_nn():
     )
 
     st.title("Tracé des pertes pour chaque modèle par rapport à chaque époque")
-    st.image(load_image("loss_plot_1_400.png"), caption="Graphique sauvegardé")
 
     if lr_value == 0.01:
         if epoch_number == 30:
-            # Placeholder for the 30 epochs loss plot
-            print()
+            st.image(load_image("loss_plot_2_30.png"), caption="Graphique sauvegardé")
         elif epoch_number == 50:
-            # Placeholder for the 50 epochs loss plot
-            print()
+            st.image(load_image("loss_plot_2_50.png"), caption="Graphique sauvegardé")
         elif epoch_number == 400:
-            # Placeholder for the 400 epochs loss plot
-            print()
+            st.image(load_image("loss_plot_2_400.png"), caption="Graphique sauvegardé")
 
     elif lr_value == 0.001:
         if epoch_number == 30:
-            # Placeholder for the 30 epochs loss plot
-            print()
+            st.image(load_image("loss_plot_1_30.png"), caption="Graphique sauvegardé")
         elif epoch_number == 50:
-            # Placeholder for the 50 epochs loss plot
-            print()
+            st.image(load_image("loss_plot_1_50.png"), caption="Graphique sauvegardé")
         elif epoch_number == 400:
-            # Placeholder for the 400 epochs loss plot
-            print()
+            st.image(load_image("loss_plot_1_400.png"), caption="Graphique sauvegardé")
 
     st.title("Animation montrant les résultats obtenu par chaque modèle par rapport à la réalité")
     gif_path = "combined_animation.gif"
@@ -66,4 +56,3 @@ def show_nn():
         )
     else:
         st.warning("Le GIF combiné n'a pas été trouvé.")
-    st.image(load_image("combined_animation.gif"), caption="Animation sauvegardée", use_container_width=True)
