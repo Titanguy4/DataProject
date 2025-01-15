@@ -8,13 +8,13 @@ import streamlit as st
 import pandas as pd
 import psutil
 import os
-from NeuralNetwork.DataManagement import normalize_tensor_global, extract_experiment_data, load_data
+from Data.DataManagement import load_data
 import numpy as np
 ################################# Ensemble des variables
 
 parameter = "h"
 model_path = "simple_nn_"+parameter+"_model.pth"
-epochs_number = 1000
+epochs_number = 50
 
 ################################# Configuration
 
@@ -111,7 +111,6 @@ def trainModel(model,epochs, train_loader, test_loader):
                 loss = loss_function(predictions, batch_targets)
                 test_loss += loss.item()
     end = time.time()
-    torch.save(model[1].state_dict(), model[0]+"save.pth")
     return train_losses, val_losses, end - start
 
 # Visualisation d'une prédiction
@@ -153,14 +152,15 @@ def show_prediction_animation(test_inputs_tensor, test_targets_tensor, model, in
     fig, axes = plt.subplots(1, 2, figsize=(12, 6))
 
     def update(index):
+        print(f"Index: {index}")
         example_input = test_inputs_tensor[index].unsqueeze(0)
         example_target = test_targets_tensor[index].view(5, 250)
 
         with torch.no_grad():
             example_prediction = model(example_input).view(5, 250)
 
-        example_target_np = example_target.cpu().numpy()
-        example_prediction_np = example_prediction.cpu().numpy()
+        example_target_np = example_target.device().numpy()
+        example_prediction_np = example_prediction.device().numpy()
 
         # Mettre à jour les images dans l'animation
         axes[0].clear()
@@ -212,6 +212,7 @@ def show_combined_prediction_animation(test_inputs_tensor, test_targets_tensor, 
         axes[i].set_title(f"Modèle {i}", fontsize=14)
 
     def update(index):
+        print(f"Index: {index}")
         example_input = test_inputs_tensor[index].unsqueeze(0)
 
         # Mettre à jour l'image de la donnée attendue
@@ -255,7 +256,7 @@ def main():
 
 
     # Charger les données
-    train_loader, test_loader, test_inputs_tensor, test_targets_tensor  = load_data()
+    train_loader, test_loader, test_inputs_tensor, test_targets_tensor  = load_data(parameter, device)
 
     list_train_losses = []
     list_test_losses = []
@@ -303,15 +304,10 @@ def main():
     })
 
 
-    _, _, test_inputs_tensor, test_targets_tensor = load_data()
+    _, _, test_inputs_tensor, test_targets_tensor = load_data(parameter, device)
 
 
-    # Afficher le tableau avec Streamlit
-    st.table(execution_data)
-
-    #set the image fit to the screen
-
-    st.image(show_combined_prediction_animation(test_inputs_tensor, test_targets_tensor, liste_modele, index_range=range(100, 150), time_step=1, save_path="combined_animation.gif"), use_container_width=True)
+    show_combined_prediction_animation(test_inputs_tensor, test_targets_tensor, liste_modele, index_range=range(0, 100), time_step=1, save_path="combined_animation.gif")
     
 
 if __name__ == "__main__":
